@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">JigsawPuzzle</string>
+    <string name="transition_level">levelSelection</string>
+
 </resources>
