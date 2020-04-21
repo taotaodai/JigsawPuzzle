@@ -17,10 +17,10 @@ class NavigationActivity : BaseActivity() {
 
         setContentView(R.layout.activity_navigation)
 
-        val vLogo = findViewById(R.id.v_logo)
+        val vLogo = findViewById<View>(R.id.v_logo)
         val animLogo = AnimationUtils.loadAnimation(this, R.anim.alpha_anim)
 
-        val logoJipu = findViewById(R.id.logo_jipu) as LogoView
+        val logoJipu = findViewById<LogoView>(R.id.logo_jipu)
 
         animLogo.fillAfter = true
         animLogo.setAnimationListener(object :Animation.AnimationListener{
@@ -37,7 +37,7 @@ class NavigationActivity : BaseActivity() {
         })
         vLogo.startAnimation(animLogo)
 
-        val btnPlay = findViewById(R.id.btn_play) as Button
+        val btnPlay = findViewById<Button>(R.id.btn_play)
         val animPlay = AnimationUtils.loadAnimation(this, R.anim.alpha_anim)
         btnPlay.startAnimation(animPlay)
         val intent = Intent()

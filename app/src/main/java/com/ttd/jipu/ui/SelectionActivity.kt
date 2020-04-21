@@ -7,6 +7,7 @@ import android.support.v4.app.ActivityOptionsCompat
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.StaggeredGridLayoutManager
 import android.support.v7.widget.Toolbar
+import android.view.View
 import android.widget.ImageView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
@@ -25,13 +26,13 @@ open class SelectionActivity : BaseActivity() {
 
         setContentView(R.layout.activity_selection)
 
-        val rvLevel = findViewById(R.id.rv_level) as RecyclerView
+        val rvLevel = findViewById<RecyclerView>(R.id.rv_level)
         val adapter = SelectionAdapter(R.layout.adapter_level_item, SELECTIONS)
         rvLevel.adapter = adapter
         rvLevel.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
         adapter.setOnItemClickListener { _, view, position ->
-            val compat = ActivityOptionsCompat.makeSceneTransitionAnimation(this@SelectionActivity, view?.findViewById(R.id.iv_level), getString(R.string.transition_level))
+            val compat = ActivityOptionsCompat.makeSceneTransitionAnimation(this@SelectionActivity, view?.findViewById(R.id.iv_level) as View, getString(R.string.transition_level))
             val intent = Intent(this@SelectionActivity, GameTableActivity::class.java)
             intent.putExtra(Question::class.java.simpleName, SELECTIONS[position])
             ActivityCompat.startActivity(this@SelectionActivity, intent, compat.toBundle())
@@ -41,7 +42,7 @@ open class SelectionActivity : BaseActivity() {
     }
 
     private fun initToolBar() {
-        val toolBar = findViewById(R.id.tb_main) as Toolbar
+        val toolBar = findViewById<Toolbar>(R.id.tb_main)
         setSupportActionBar(toolBar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolBar.setNavigationOnClickListener {

@@ -15,7 +15,7 @@ class QuestionBank {
             /**
              * 3*3
              */
-            questions += Question(R.drawable.a_2)
+            questions += Question(R.drawable.a_2, 2, 2)
             /**
              * 3*3  黑白
              */

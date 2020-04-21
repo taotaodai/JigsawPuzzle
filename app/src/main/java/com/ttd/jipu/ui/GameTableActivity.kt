@@ -42,7 +42,7 @@ class GameTableActivity : BaseActivity() {
     }
 
     private fun initToolBar() {
-        val toolBar = findViewById(R.id.tb_main) as Toolbar
+        val toolBar = findViewById<Toolbar>(R.id.tb_main)
         setSupportActionBar(toolBar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolBar.setNavigationOnClickListener {
