@@ -27,16 +27,16 @@ class LogoView : View {
         for (i in 0..ROW - 1) {
             for (j in 0..COL - 1) {
                 if (i == 0 && j == 0) {
-                    canvas!!.drawBitmap(pieces[index++], j * tileWidth.toFloat() + tileWidth * rate / FINISH_RATE, i * tileHeight.toFloat(), Paint())
+                    canvas!!.drawBitmap(pieces[index++]!!, j * tileWidth.toFloat() + tileWidth * rate / FINISH_RATE, i * tileHeight.toFloat(), Paint())
                 }
                 if (i == 1 && j == 0) {
-                    canvas!!.drawBitmap(pieces[index++], j * tileWidth.toFloat(), i * tileHeight.toFloat() - tileHeight * rate / FINISH_RATE, Paint())
+                    canvas!!.drawBitmap(pieces[index++]!!, j * tileWidth.toFloat(), i * tileHeight.toFloat() - tileHeight * rate / FINISH_RATE, Paint())
                 }
                 if (i == 0 && j == 1) {
-                    canvas!!.drawBitmap(pieces[index++], j * tileWidth.toFloat(), i * tileHeight.toFloat() + tileHeight * rate / FINISH_RATE, Paint())
+                    canvas!!.drawBitmap(pieces[index++]!!, j * tileWidth.toFloat(), i * tileHeight.toFloat() + tileHeight * rate / FINISH_RATE, Paint())
                 }
                 if (i == 1 && j == 1) {
-                    canvas!!.drawBitmap(pieces[index++], j * tileWidth.toFloat() - tileWidth * rate / FINISH_RATE, i * tileHeight.toFloat(), Paint())
+                    canvas!!.drawBitmap(pieces[index++]!!, j * tileWidth.toFloat() - tileWidth * rate / FINISH_RATE, i * tileHeight.toFloat(), Paint())
                 }
 
             }

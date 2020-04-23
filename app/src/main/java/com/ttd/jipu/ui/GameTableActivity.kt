@@ -1,9 +1,9 @@
 package com.ttd.jipu.ui
 
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v7.view.menu.MenuBuilder
-import android.support.v7.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View

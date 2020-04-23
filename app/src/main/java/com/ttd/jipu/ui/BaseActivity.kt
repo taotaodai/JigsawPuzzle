@@ -1,7 +1,7 @@
 package com.ttd.jipu.ui
 
 import android.content.pm.ActivityInfo
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 
 open class BaseActivity : AppCompatActivity() {

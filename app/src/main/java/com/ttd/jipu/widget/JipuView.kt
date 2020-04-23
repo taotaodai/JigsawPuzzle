@@ -247,7 +247,7 @@ class JipuView : View {
                     continue
                 }
 
-                canvas!!.drawBitmap(pieces[index], tile.ep.x.toFloat(), tile.ep.y.toFloat(), paint)
+                canvas?.drawBitmap(pieces[index]!!, tile.ep.x.toFloat(), tile.ep.y.toFloat(), paint)
                 /**
                  * 添加遮挡物
                  */
@@ -259,7 +259,7 @@ class JipuView : View {
                             paintA.alpha = DEFAULT_ALPHA - DEFAULT_ALPHA * (RATE_FINISH - rateShelter) / RATE_FINISH
                         }
 //                        Log.i("aaaa", paintA.alpha.toString())
-                        canvas.drawBitmap(piece.bitmap, tile.ep.x.toFloat(), tile.ep.y.toFloat(), paintA)
+                        canvas?.drawBitmap(piece.bitmap!!, tile.ep.x.toFloat(), tile.ep.y.toFloat(), paintA)
                         if (rateShelter == RATE_FINISH) {
                             isShelterAniming = false
                             piece.isShelterAnimed = true
