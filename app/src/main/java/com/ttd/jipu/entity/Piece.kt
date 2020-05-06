@@ -5,11 +5,7 @@ import android.graphics.Bitmap
 /**
  * Created by wt on 2018/4/27.
  */
-class Piece{
-    var bitmap: Bitmap? = null
-    var isShelterAnimed:Boolean = false
+class Piece(var bitmap: Bitmap?) {
+    var isShelterAnimed: Boolean = false
 
-    constructor(bitmap: Bitmap?) {
-        this.bitmap = bitmap
-    }
 }

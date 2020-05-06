@@ -19,7 +19,6 @@ import com.ttd.jipu.utils.QuestionBank
  * Created by wt on 2018/4/20.
  */
 open class SelectionActivity : BaseActivity() {
-    val SELECTIONS: List<Question> = QuestionBank.getQuestions()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,5 +56,8 @@ open class SelectionActivity : BaseActivity() {
             iv?.setImageResource(item!!.imgRes)
         }
 
+    }
+    companion object {
+        private val SELECTIONS: List<Question> = QuestionBank.getQuestions()
     }
 }

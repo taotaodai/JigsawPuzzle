@@ -7,9 +7,7 @@ import android.graphics.PointF
  * Created by wt on 2018/3/29.
  * 拼图块对象。这里
  */
-class Tile {
-    var index: Int = 0
-    var toMove: Boolean = false
+class Tile(var index: Int) {
     /**
      * 拼图移动前的起始位置
      */
@@ -23,10 +21,5 @@ class Tile {
      */
     var epFinal: Point = Point()
     var isTouched: Boolean = false
-    var hasShelter :Boolean = false
-
-    constructor(index: Int) {
-        this.index = index
-    }
 
 }

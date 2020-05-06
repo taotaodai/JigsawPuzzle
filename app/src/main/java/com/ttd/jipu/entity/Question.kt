@@ -27,10 +27,6 @@ class Question : Serializable {
      */
     var shelterCount: Int = 0
 
-    constructor(imgRes: Int) {
-        this.imgRes = imgRes
-    }
-
     constructor(imgRes: Int, saturability: Float) {
         this.imgRes = imgRes
         this.saturability = saturability
@@ -42,22 +38,8 @@ class Question : Serializable {
         col = gridNum
     }
 
-    constructor(imgRes: Int, saturability: Float, gridNum: Int) {
-        this.imgRes = imgRes
-        this.saturability = saturability
-        row = gridNum
-        col = gridNum
-    }
-
     constructor(imgRes: Int, row: Int, col: Int) {
         this.imgRes = imgRes
-        this.row = row
-        this.col = col
-    }
-
-    constructor(imgRes: Int, saturability: Float, row: Int, col: Int) {
-        this.imgRes = imgRes
-        this.saturability = saturability
         this.row = row
         this.col = col
     }

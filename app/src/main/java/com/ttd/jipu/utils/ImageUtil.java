@@ -1,6 +1,5 @@
 package com.ttd.jipu.utils;
 
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +12,7 @@ import android.view.ViewTreeObserver;
  * Created by wt on 2018/3/29.
  */
 
+@Deprecated
 public class ImageUtil {
 
     public static void scaleImage(final Activity activity, final View view, int drawableResId) {

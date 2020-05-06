@@ -10,7 +10,7 @@ import com.ttd.jipu.R
 class QuestionBank {
     companion object {
         fun getQuestions(): List<Question> {
-            var questions: List<Question> = listOf()
+            val questions: MutableList<Question> = mutableListOf()
 
             /**
              * 3*3
@@ -31,7 +31,7 @@ class QuestionBank {
             /**
              * 4*4  加遮挡物(3个)
              */
-            var q4 = Question(R.drawable.a_5, 3, 4)
+            val q4 = Question(R.drawable.a_5, 3, 4)
             q4.shelterCount = 1
             questions += q4
 

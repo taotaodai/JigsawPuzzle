@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.Toast
+import androidx.core.content.res.ResourcesCompat
 import com.ttd.jipu.entity.Piece
 import com.ttd.jipu.entity.Tile
 import rx.Observable
@@ -33,10 +34,6 @@ class JipuView : View {
      */
     var row: Int = 0
     /**
-     * 用来进行拼图块位移，上下左右四个方向，移动一格
-     */
-    private val DIR = arrayOf(arrayOf(0, 1), arrayOf(1, 0), arrayOf(0, -1), arrayOf(-1, 0))
-    /**
      * 每块拼图宽度
      */
     private var tileWidth: Int = 0
@@ -47,43 +44,26 @@ class JipuView : View {
     /**
      * 用来记录拼图位置的二维数组
      */
-    lateinit var tileDatas: Array<Array<Tile>>
+    private lateinit var tileDatas: Array<Array<Tile>>
     /**
      * 记录图片资源是否已经计算缩放比
      */
-    var isScale: Boolean = false
-    /**
-     * 记录基础数据是否初始化
-     */
-    var isInited: Boolean = false
+    private var isScale: Boolean = false
 
-    var isFirstLoad: Boolean = true
+    private var isFirstLoad: Boolean = true
 
-//    var misionComplete: Boolean = false
     /**
      * 拼图图片资源缩放比
      */
-    var scale: Float = 1f
+    private var scale: Float = 1f
     /**
      * 拼图图片资源id
      */
     var imgRes: Int = 0
     /**
-     * 拼图状态-预览
-     */
-    private val STATE_PREVIEW: Int = 0
-    /**
-     * 拼图状态-生成中
-     */
-    private val STATE_GENERATING: Int = 1
-    /**
-     * 拼图状态-拼图中
-     */
-    val STATE_PLAYING: Int = 2
-    /**
      * 拼图状态
      */
-    var state: Int = STATE_PREVIEW
+    private var state: Int = STATE_PREVIEW
     /**
      * 遮挡物数量
      */
@@ -96,12 +76,16 @@ class JipuView : View {
     /**
      * 用来存储每块拼图的位图数组
      */
-    lateinit var pieces: Array<Bitmap?>
-    lateinit var shelterPieces: Array<Piece?>
+    private lateinit var pieces: Array<Bitmap?>
+    private lateinit var shelterPieces: Array<Piece?>
 
-    constructor(context: Context) : super(context)
+    constructor(context: Context) : super(context) {
+        init()
+    }
 
-    constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet)
+    constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet) {
+        init()
+    }
 
     /**
      * 初始化基础数据
@@ -138,15 +122,14 @@ class JipuView : View {
      */
     private fun getInitialImage(): Bitmap {
         val matrix = Matrix()
-//        matrix.postScale(scale, scale)
         matrix.setScale(scale, scale)
-        val bm: Bitmap = (resources.getDrawable(imgRes) as? BitmapDrawable)!!.bitmap
+        val bm: Bitmap = (ResourcesCompat.getDrawable(resources, imgRes, null) as? BitmapDrawable)!!.bitmap
         bm.height
         return Bitmap.createBitmap(bm, 0, 0, bm.width, bm.height, matrix, true)
     }
 
     private fun getShelterImage(): Bitmap {
-        val bm: Bitmap = (resources.getDrawable(shelterRes) as? BitmapDrawable)!!.bitmap
+        val bm: Bitmap = (ResourcesCompat.getDrawable(resources, shelterRes, null) as? BitmapDrawable)!!.bitmap
         val matrix = Matrix()
         matrix.postScale(tileWidth.toFloat() / bm.width, tileWidth.toFloat() / bm.width)
 
@@ -154,33 +137,35 @@ class JipuView : View {
     }
 
     /**
-     * 默认饱和度
-     */
-    private var DEFAULT_SATURABILITY: Float = 1f
-    /**
-     * 默认透明度
-     */
-    var DEFAULT_ALPHA: Int = 255
-    var alpha: Int = DEFAULT_ALPHA
-    /**
      * 饱和度
      */
     var saturability: Float = DEFAULT_SATURABILITY
     /**
      * 是否开启饱和度
      */
-    var openSaturability: Boolean = false
+    private var openSaturability: Boolean = false
     /**
      * 是否开启遮挡物
      */
-    var openShelter: Boolean = false
+    private var openShelter: Boolean = false
+
+    /**
+     * 绘图相关对象
+     */
+    private lateinit var paint: Paint
+    private lateinit var paintAlpha: Paint
+
+    private fun init() {
+        paint = Paint()
+        paintAlpha = Paint()
+    }
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
         if (state == STATE_PREVIEW) {
             val bm: Bitmap = getInitialImage()
-            canvas!!.drawBitmap(bm, 0f, 0f, Paint())
+            canvas!!.drawBitmap(bm, 0f, 0f, paint)
             return
         }
         if (rateTranslation == RATE_FINISH) {
@@ -214,19 +199,19 @@ class JipuView : View {
 
         val isSuccess = isSuccess()
 
-        val paint = Paint()
+//        val paint = Paint()
         /**
          * 添加饱和度
          */
-        val saturationmatrix = ColorMatrix()
+//        val saturationmatrix = ColorMatrix()
 
-        val tempSaturability = (saturability + (DEFAULT_SATURABILITY - saturability) * ((RATE_FINISH - rateSaturability).toFloat() / RATE_FINISH))
-        if (tempSaturability == saturability) {
-            isSatubiAniming = false
-        }
+//        val tempSaturability = (saturability + (DEFAULT_SATURABILITY - saturability) * ((RATE_FINISH - rateSaturability).toFloat() / RATE_FINISH))
+//        if (tempSaturability == saturability) {
+//            isSatubiAniming = false
+//        }
 
-        saturationmatrix.setSaturation(if (openSaturability) tempSaturability else DEFAULT_SATURABILITY)
-        paint.colorFilter = ColorMatrixColorFilter(saturationmatrix)
+//        saturationmatrix.setSaturation(if (openSaturability) tempSaturability else DEFAULT_SATURABILITY)
+//        paint.colorFilter = ColorMatrixColorFilter(saturationmatrix)
         /**
          * 遍历绘制每块拼图
          */
@@ -254,19 +239,17 @@ class JipuView : View {
                 if (openShelter) {
                     val piece = shelterPieces[index]
                     if (piece?.bitmap != null) {
-                        val paintA = Paint()
                         if (!piece.isShelterAnimed) {
-                            paintA.alpha = DEFAULT_ALPHA - DEFAULT_ALPHA * (RATE_FINISH - rateShelter) / RATE_FINISH
+                            paintAlpha.alpha = DEFAULT_ALPHA - DEFAULT_ALPHA * (RATE_FINISH - rateShelter) / RATE_FINISH
                         }
-//                        Log.i("aaaa", paintA.alpha.toString())
-                        canvas?.drawBitmap(piece.bitmap!!, tile.ep.x.toFloat(), tile.ep.y.toFloat(), paintA)
+                        canvas?.drawBitmap(piece.bitmap!!, tile.ep.x.toFloat(), tile.ep.y.toFloat(), paintAlpha)
                         if (rateShelter == RATE_FINISH) {
                             isShelterAniming = false
                             piece.isShelterAnimed = true
                         }
                     }
                 }
-//                Log.i("aaaaa", "第" + times + "次绘图(" + tile.index + "):" + tile.ep.x.toString() + "," + tile.ep.y)
+                Log.i("aaaaa", "第" + times + "次绘图(" + tile.index + "):" + tile.ep.x.toString() + "," + tile.ep.y)
             }
         }
 
@@ -275,7 +258,6 @@ class JipuView : View {
         if (isSuccess && state == STATE_PLAYING) {
             /**
              * 拼图完成，提示用户
-             * TODO
              */
             Toast.makeText(context, "ok的", Toast.LENGTH_SHORT).show()
             /**
@@ -309,27 +291,6 @@ class JipuView : View {
      * 遮挡物显示动画完成率
      */
     private var rateShelter: Int = 0
-    val ANIM_TRANSLATION: Int = 0
-    val ANIM_SATURABILITY: Int = 1
-    val ANIM_SHELTER: Int = 2
-
-    /**
-     * 动画起始完成率
-     */
-    val RATE_START: Int = 0
-    /**
-     * 动画最大完成率
-     */
-    val RATE_FINISH: Int = 100
-    /**
-     * 用户移动拼块时动画间隔
-     */
-    val ANIM_DURATION_PLAY: Long = 200
-
-    /**
-     * 打乱时拼块时动画间隔
-     */
-    val ANIM_DURATION_AUTO: Long = 10
 
     private fun initAnimationData() {
         isTransAniming = false
@@ -353,7 +314,7 @@ class JipuView : View {
         val epFinal = tile.epFinal
         val anim: ValueAnimator = ValueAnimator.ofInt(0, RATE_FINISH).setDuration(if (state == STATE_GENERATING) ANIM_DURATION_AUTO else ANIM_DURATION_PLAY)
         anim.addUpdateListener { listener: ValueAnimator ->
-            val p = listener.getAnimatedValue() as Int
+            val p = listener.animatedValue as Int
             rateTranslation = p
             if (p > 0) {
                 ep.x = epFinal.x - ((epFinal.x - sp.x) * (RATE_FINISH - p) / RATE_FINISH)
@@ -361,8 +322,7 @@ class JipuView : View {
 
                 invalidate()
 
-//                Log.i("aaaa", p.toString())
-//                Log.i("aaaa", "第" + ++times + "次(" + tile.index + "):" + ep.x.toString() + "," + ep.y)
+                Log.i("aaaa", "第" + ++times + "次(" + tile.index + "):" + ep.x.toString() + "," + ep.y)
             }
         }
         anim.addPauseListener(object : Animator.AnimatorPauseListener {
@@ -466,13 +426,6 @@ class JipuView : View {
             }
         }
     }
-
-    /**
-     * 打乱拼图位置数据。
-     * 为了避免无解的情况出现，这里模拟拼图还原时的规则，
-     * 对拼图位置数据打乱。
-     */
-    val RANDOM_TIMES: Int = 50
 
     private fun createRandomBoard(times: Int, blankPoint: Point?) {
         /**
@@ -734,7 +687,7 @@ class JipuView : View {
              */
 
             val tempSp = Point(tileTouch.sp.x, tileTouch.sp.y)
-            val tempEp = Point(tileTouch.ep.x, tileTouch.ep.y)
+//            val tempEp = Point(tileTouch.ep.x, tileTouch.ep.y)
             /**
              * 交换空白块和选中拼图的目标坐标
              */
@@ -754,10 +707,10 @@ class JipuView : View {
              * 因为只有当相邻拼块中有空白拼块时才能移动。
              */
             var isValid = false
-            for (i: Int in 0 until DIR.size) {
+            for (i: Int in DIR.indices) {
                 val newX: Int = point.x + DIR[i][0]
                 val newY: Int = point.y + DIR[i][1]
-                if (newX in 0..(col - 1) && newY >= 0 && newY < row) {
+                if (newX in 0 until col && newY >= 0 && newY < row) {
                     if (tileDatas[newY][newX].index == col * row - 1) {
                         /**
                          * 当检查到有相邻有空白拼块时，设置其为被触摸状态
@@ -789,7 +742,7 @@ class JipuView : View {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (isBeyondTheBoundary(event) || isAniming() || (rateTranslation in 1..(RATE_FINISH - 1))) {
+        if (isBeyondTheBoundary(event) || isAniming() || (rateTranslation in 1 until RATE_FINISH)) {
             return true
         }
         val point = xyToIndex(event!!.x.toInt(), event.y.toInt())
@@ -804,12 +757,66 @@ class JipuView : View {
             /**
              * 以控件的宽度/图片宽度，计算图片缩放比
              */
-            val scaleTemp = measuredWidth.toFloat() / (resources.getDrawable(imgRes) as? BitmapDrawable)!!.bitmap.width.toFloat()
+            val scaleTemp = measuredWidth.toFloat() / (ResourcesCompat.getDrawable(resources, imgRes, null) as? BitmapDrawable)!!.bitmap.width.toFloat()
 //            if (scaleTemp > 1) {
             scale = scaleTemp
 //            }
             isScale = true
         }
         super.onLayout(changed, left, top, right, bottom)
+    }
+
+    companion object {
+        private const val ANIM_TRANSLATION: Int = 0
+        private const val ANIM_SATURABILITY: Int = 1
+        private const val ANIM_SHELTER: Int = 2
+
+        /**
+         * 拼图状态-预览
+         */
+        private const val STATE_PREVIEW: Int = 0
+        /**
+         * 拼图状态-生成中
+         */
+        private const val STATE_GENERATING: Int = 1
+        /**
+         * 拼图状态-拼图中
+         */
+        private const val STATE_PLAYING: Int = 2
+
+        /**
+         * 默认饱和度
+         */
+        private const val DEFAULT_SATURABILITY: Float = 1f
+        /**
+         * 默认透明度
+         */
+        private const val DEFAULT_ALPHA: Int = 255
+        /**
+         * 用来进行拼图块位移，上下左右四个方向，移动一格
+         */
+        private val DIR = arrayOf(arrayOf(0, 1), arrayOf(1, 0), arrayOf(0, -1), arrayOf(-1, 0))
+        /**
+         * 动画起始完成率
+         */
+        private const val RATE_START: Int = 0
+        /**
+         * 动画最大完成率
+         */
+        private const val RATE_FINISH: Int = 100
+        /**
+         * 用户移动拼块时动画间隔
+         */
+        private const val ANIM_DURATION_PLAY: Long = 200
+        /**
+         * 打乱时拼块时动画间隔
+         */
+        private const val ANIM_DURATION_AUTO: Long = 10
+        /**
+         * 打乱拼图位置数据。
+         * 为了避免无解的情况出现，这里模拟拼图还原时的规则，
+         * 对拼图位置数据打乱。
+         */
+        private const val RANDOM_TIMES: Int = 50
     }
 }

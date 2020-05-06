@@ -1,5 +1,6 @@
 package com.ttd.jipu.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.appcompat.view.menu.MenuBuilder
@@ -13,14 +14,15 @@ import com.ttd.jipu.R
 
 
 class GameTableActivity : BaseActivity() {
-    lateinit var jpvMain: JipuView
-    lateinit var question: Question
+    private lateinit var jpvMain: JipuView
+    private lateinit var question: Question
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_table)
 
         question = intent.getSerializableExtra(Question::class.java.simpleName) as Question
-        jpvMain = findViewById(R.id.jpv_main) as JipuView
+        jpvMain = findViewById(R.id.jpv_main)
         jpvMain.imgRes = question.imgRes
         jpvMain.saturability = question.saturability
         jpvMain.row = question.row
@@ -56,8 +58,8 @@ class GameTableActivity : BaseActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.action_reset -> {
                 jpvMain.initPuzzle()
                 jpvMain.createRandomBoard()
@@ -88,6 +90,7 @@ class GameTableActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onPrepareOptionsPanel(view: View?, menu: Menu?): Boolean {
         if (menu != null) {
             if (menu.javaClass == MenuBuilder::class.java) {
