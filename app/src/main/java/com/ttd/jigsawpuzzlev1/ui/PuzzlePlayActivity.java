@@ -1,5 +1,7 @@
 package com.ttd.jigsawpuzzlev1.ui;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +16,7 @@ import com.ttd.jigsawpuzzlev1.R;
 import com.ttd.jigsawpuzzlev1.component.BlockView;
 import com.ttd.jigsawpuzzlev1.component.Floor;
 import com.ttd.jigsawpuzzlev1.component.PuzzleBoard;
+import com.ttd.jigsawpuzzlev1.data.PuzzleContent;
 import com.ttd.jigsawpuzzlev1.data.PuzzlePiece;
 import com.ttd.jigsawpuzzlev1.utils.DisplayUtil;
 
@@ -21,7 +24,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
 
-public class PuzzleShowDemoActivity extends BaseActivity implements View.OnClickListener {
+public class PuzzlePlayActivity extends BaseActivity implements View.OnClickListener {
     private BlockCropper blockCropper;
     private Floor floor;
     private PuzzleBoard pbContainer;
@@ -30,6 +33,13 @@ public class PuzzleShowDemoActivity extends BaseActivity implements View.OnClick
     private View vMagnify;
     private View vLessen;
     private TextView vBoard;
+    private PuzzleContent puzzleContent;
+
+    public static void start(Context context, PuzzleContent puzzleContent) {
+        Intent intent = new Intent(context, PuzzlePlayActivity.class);
+        intent.putExtra(PuzzleContent.class.getSimpleName(), puzzleContent);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,7 +51,6 @@ public class PuzzleShowDemoActivity extends BaseActivity implements View.OnClick
         llBlockList = findViewById(R.id.ll_block_list);
         llOperation = findViewById(R.id.ll_operation);
         vBoard = findViewById(R.id.tv_board);
-        blockCropper = new BlockCropper(this, R.mipmap.test_res1);
         vMagnify = findViewById(R.id.v_magnify);
         vLessen = findViewById(R.id.v_lessen);
         vMagnify.setOnClickListener(this);
@@ -62,10 +71,16 @@ public class PuzzleShowDemoActivity extends BaseActivity implements View.OnClick
         screenHeight = (int) DisplayUtil.getScreenHeight(this);
         floorWidth = screenWidth * 3;
         floorHeight = screenHeight * 3;
+        puzzleContent = (PuzzleContent) getIntent().getSerializableExtra(PuzzleContent.class.getSimpleName());
+        if (puzzleContent == null) {
+            finish();
+        }
     }
 
     private void initViews() {
         ViewGroup.LayoutParams layoutParams = floor.getLayoutParams();
+//        blockCropper = new BlockCropper(this, R.mipmap.test_res1);
+        blockCropper = new BlockCropper(this, puzzleContent);
 
         int maxWidth = floorWidth;
         int maxHeight = floorHeight;
@@ -140,7 +155,7 @@ public class PuzzleShowDemoActivity extends BaseActivity implements View.OnClick
 
     private void magnify(float scale) {
         float scaleX = pbContainer.getScaleX();
-        if(scaleX <= 2f){
+        if (scaleX <= 2f) {
             pbContainer.setScaleX(scale);
             pbContainer.setScaleY(scale);
         }

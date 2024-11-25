@@ -1,6 +1,7 @@
 package com.ttd.jigsawpuzzlev1.ui;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -15,8 +16,11 @@ import android.graphics.RectF;
 
 import com.ttd.jigsawpuzzlev1.R;
 import com.ttd.jigsawpuzzlev1.data.Point;
+import com.ttd.jigsawpuzzlev1.data.PuzzleContent;
 import com.ttd.jigsawpuzzlev1.data.PuzzlePiece;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +29,7 @@ import java.util.List;
  * 一幅完整的拼图由14种碎片类型组成
  */
 public class BlockCropper {
-    private final Bitmap originalBitmap;
+    private Bitmap originalBitmap;
     private final Context context;
     private int slotRadius = 25;//插槽半径。
     private int slotDiameter = slotRadius * 2;//圆弧直径
@@ -41,6 +45,19 @@ public class BlockCropper {
     public BlockCropper(Context context,int resId){
         this.context = context;
         this.originalBitmap  = BitmapFactory.decodeResource(context.getResources(), resId);
+    }
+
+    public BlockCropper(Context context, PuzzleContent puzzleContent) {
+        this.context = context;
+        AssetManager assetManager = context.getAssets();
+        if(puzzleContent.isComesWith()){
+            try {
+                InputStream is = assetManager.open(puzzleContent.getFilePath());
+                this.originalBitmap = BitmapFactory.decodeStream(is);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public Bitmap getOriginalBitmap() {
