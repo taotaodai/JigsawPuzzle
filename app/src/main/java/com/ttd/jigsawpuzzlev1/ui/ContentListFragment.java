@@ -14,8 +14,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ttd.jigsawpuzzlev1.MyApplication;
 import com.ttd.jigsawpuzzlev1.R;
+import com.ttd.jigsawpuzzlev1.data.DaoSession;
 import com.ttd.jigsawpuzzlev1.data.PuzzleContent;
+import com.ttd.jigsawpuzzlev1.data.PuzzleContentDao;
+import com.ttd.jigsawpuzzlev1.data.PuzzleItem;
+import com.ttd.jigsawpuzzlev1.data.PuzzleItemDao;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,61 +51,76 @@ public class ContentListFragment extends Fragment implements TabFragmentAdapter.
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            List<PuzzleContent> children = (List<PuzzleContent>) bundle.getSerializable(PuzzleContent[].class.getSimpleName());
-            if (children != null) {
-                PuzzleContentsAdapter adapter = new PuzzleContentsAdapter(children);
-                setOnItemClickListener(adapter);
-                rvContents.setAdapter(adapter);
-                return;
-            }
-        }
         initDefaultContents();
+        refresh();
     }
 
     private void setOnItemClickListener(PuzzleContentsAdapter adapter) {
         adapter.setOnItemClickListener((baseQuickAdapter, view, i) -> {
             PuzzleContent item = baseQuickAdapter.getItems().get(i);
-            if (item.isClassification()) {
-                if (contentListFragmentListener != null) {
-                    contentListFragmentListener.onContentClick(item.getChildren());
-                }
-            } else {
-                PuzzlePlayActivity.start(getContext(), item);
+            if (contentListFragmentListener != null) {
+                contentListFragmentListener.onContentClick(item);
             }
         });
     }
 
     private void initDefaultContents() {
+        DaoSession daoSession = ((MyApplication) context.getApplicationContext()).getDaoSession();
+        PuzzleContentDao puzzleContentDao = daoSession.getPuzzleContentDao();
+        PuzzleItemDao puzzleItemDao = daoSession.getPuzzleItemDao();
         AssetManager assetManager = context.getAssets();
         try {
             String rootDir = "gallery/";
             String[] contentDirs = assetManager.list(rootDir);
             Log.i(getClass().getSimpleName(), Arrays.toString(contentDirs));
             if (contentDirs != null) {
-                List<PuzzleContent> puzzleContents = new ArrayList<>();
+                long dirId = 0;
+                long puzzleId = 0;
                 for (String path : contentDirs) {
+                    dirId++;
                     String dir = rootDir + path + File.separator;
                     String[] pathArray = assetManager.list(dir);
                     Log.i(getClass().getSimpleName(), Arrays.toString(pathArray));
                     if (pathArray != null && pathArray.length > 0) {
-                        List<PuzzleContent> children = new ArrayList<>();
                         for (String fileName : pathArray) {
-                            children.add(new PuzzleContent(dir + fileName, true));
+                            puzzleId++;
+                            PuzzleItem puzzleItem = new PuzzleItem(puzzleId, dirId, true, dir + fileName);
+                            puzzleItemDao.insertOrReplace(puzzleItem);
                         }
+
                         //取第一张作为封面
-                        PuzzleContent puzzleContent = new PuzzleContent(dir + pathArray[0], true, true, children);
-                        puzzleContents.add(puzzleContent);
+                        PuzzleContent puzzleContent = new PuzzleContent(dirId, "", dir + pathArray[0], true);
+                        puzzleContentDao.insertOrReplace(puzzleContent);
                     }
                 }
-                PuzzleContentsAdapter adapter = new PuzzleContentsAdapter(puzzleContents);
-                setOnItemClickListener(adapter);
-
-                rvContents.setAdapter(adapter);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void refresh() {
+        DaoSession daoSession = ((MyApplication) context.getApplicationContext()).getDaoSession();
+        PuzzleContentDao puzzleContentDao = daoSession.getPuzzleContentDao();
+        PuzzleItemDao puzzleItemDao = daoSession.getPuzzleItemDao();
+
+        //先查出所有自带的拼图目录
+        List<PuzzleContent> puzzleContentList = puzzleContentDao.queryBuilder().where(PuzzleContentDao.Properties.IsComesWith.eq(true)).list();
+        for (PuzzleContent puzzleContent : puzzleContentList) {
+            List<PuzzleItem> puzzleItems = puzzleItemDao.queryBuilder().where(PuzzleItemDao.Properties.ContentId.eq(puzzleContent.getId())).list();
+            puzzleContent.setPuzzlePicList(puzzleItems);
+        }
+
+        List<PuzzleContent> puzzleContentListNew = puzzleContentDao.queryBuilder().where(PuzzleContentDao.Properties.IsComesWith.eq(false)).list();
+        for (PuzzleContent puzzleContent : puzzleContentListNew) {
+            List<PuzzleItem> puzzleItems = puzzleItemDao.queryBuilder().where(PuzzleItemDao.Properties.ContentId.eq(puzzleContent.getId())).list();
+            puzzleContent.setPuzzlePicList(puzzleItems);
+        }
+        puzzleContentList.addAll(puzzleContentListNew);
+
+        PuzzleContentsAdapter adapter = new PuzzleContentsAdapter(puzzleContentList);
+        setOnItemClickListener(adapter);
+
+        rvContents.setAdapter(adapter);
     }
 }

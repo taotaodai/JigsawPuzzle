@@ -13,6 +13,12 @@
         tools:src="@mipmap/test_res4"
         android:scaleType="centerCrop"
         android:background="@color/teal_700"/>
+    <TextView
+        android:id="@+id/tv_content_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="新建目录"
+        android:layout_margin="4dp"/>
 
     <FrameLayout
         android:layout_width="36dp"

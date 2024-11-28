@@ -16,7 +16,7 @@ import com.ttd.jigsawpuzzlev1.R;
 import com.ttd.jigsawpuzzlev1.component.BlockView;
 import com.ttd.jigsawpuzzlev1.component.Floor;
 import com.ttd.jigsawpuzzlev1.component.PuzzleBoard;
-import com.ttd.jigsawpuzzlev1.data.PuzzleContent;
+import com.ttd.jigsawpuzzlev1.data.PuzzleItem;
 import com.ttd.jigsawpuzzlev1.data.PuzzlePiece;
 import com.ttd.jigsawpuzzlev1.utils.DisplayUtil;
 
@@ -33,11 +33,11 @@ public class PuzzlePlayActivity extends BaseActivity implements View.OnClickList
     private View vMagnify;
     private View vLessen;
     private TextView vBoard;
-    private PuzzleContent puzzleContent;
+    private PuzzleItem puzzleItem;
 
-    public static void start(Context context, PuzzleContent puzzleContent) {
+    public static void start(Context context, PuzzleItem puzzleItem) {
         Intent intent = new Intent(context, PuzzlePlayActivity.class);
-        intent.putExtra(PuzzleContent.class.getSimpleName(), puzzleContent);
+        intent.putExtra(PuzzleItem.class.getSimpleName(), puzzleItem);
         context.startActivity(intent);
     }
 
@@ -71,8 +71,8 @@ public class PuzzlePlayActivity extends BaseActivity implements View.OnClickList
         screenHeight = (int) DisplayUtil.getScreenHeight(this);
         floorWidth = screenWidth * 3;
         floorHeight = screenHeight * 3;
-        puzzleContent = (PuzzleContent) getIntent().getSerializableExtra(PuzzleContent.class.getSimpleName());
-        if (puzzleContent == null) {
+        puzzleItem = (PuzzleItem) getIntent().getSerializableExtra(PuzzleItem.class.getSimpleName());
+        if (puzzleItem == null) {
             finish();
         }
     }
@@ -80,7 +80,7 @@ public class PuzzlePlayActivity extends BaseActivity implements View.OnClickList
     private void initViews() {
         ViewGroup.LayoutParams layoutParams = floor.getLayoutParams();
 //        blockCropper = new BlockCropper(this, R.mipmap.test_res1);
-        blockCropper = new BlockCropper(this, puzzleContent);
+        blockCropper = new BlockCropper(this, puzzleItem);
 
         int maxWidth = floorWidth;
         int maxHeight = floorHeight;

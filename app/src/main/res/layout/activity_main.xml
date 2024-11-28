@@ -4,18 +4,38 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <com.flyco.tablayout.SlidingTabLayout
-        android:id="@+id/stl_contents"
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        app:tl_textUnselectColor="@color/white"
-        app:tl_textSelectColor="@color/white"
-        android:background="@color/purple_200"
-        app:tl_indicator_corner_radius="8dp"
-        app:tl_indicator_style="BLOCK"
-        app:tl_indicator_color="@color/purple_500"
-        app:tl_indicator_margin_left="4dp"
-        app:tl_indicator_margin_right="4dp"/>
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/purple_200">
+        <com.flyco.tablayout.SlidingTabLayout
+            android:id="@+id/stl_contents"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            app:tl_textUnselectColor="@color/white"
+            app:tl_textSelectColor="@color/white"
+            app:tl_indicator_corner_radius="8dp"
+            app:tl_indicator_style="BLOCK"
+            app:tl_indicator_color="@color/purple_500"
+            app:tl_indicator_margin_left="4dp"
+            app:tl_indicator_margin_right="4dp"/>
+        <FrameLayout
+            android:id="@+id/v_add"
+            android:layout_width="40dp"
+            android:layout_height="40dp">
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@mipmap/ic_add"
+                android:padding="6dp"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+
+    </LinearLayout>
+
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/vp_contents"

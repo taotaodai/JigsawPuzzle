@@ -49,12 +49,6 @@ public class TabFragmentAdapter extends PagerAdapter {
         this.titles = titles;
     }
 
-    public void setFragments(ArrayList fragments) {
-        if (this.fragments != null) {
-            this.fragments = fragments;
-        }
-    }
-
     public Fragment getItem(int position) {
         return fragments.get(position);
     }

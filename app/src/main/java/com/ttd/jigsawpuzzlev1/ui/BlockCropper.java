@@ -1,26 +1,21 @@
 package com.ttd.jigsawpuzzlev1.ui;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.graphics.RectF;
 
-import com.ttd.jigsawpuzzlev1.R;
 import com.ttd.jigsawpuzzlev1.data.Point;
-import com.ttd.jigsawpuzzlev1.data.PuzzleContent;
+import com.ttd.jigsawpuzzlev1.data.PuzzleItem;
 import com.ttd.jigsawpuzzlev1.data.PuzzlePiece;
+import com.ttd.jigsawpuzzlev1.utils.PuzzleImageHelper;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,32 +26,20 @@ import java.util.List;
 public class BlockCropper {
     private Bitmap originalBitmap;
     private final Context context;
-    private int slotRadius = 25;//插槽半径。
-    private int slotDiameter = slotRadius * 2;//圆弧直径
-    private int slotDepth = slotRadius * 2;//插槽和插头的深度和长度相同，均为半径的*2
-    private int blockMinSize = 128;//图块最小处尺寸，
-    private int dBorderToSlot = (blockMinSize - slotDepth) / 2;//图块边界到插槽的距离
+    private final int slotRadius = 25;//插槽半径。
+    private final int slotDiameter = slotRadius * 2;//圆弧直径
+    private final int slotDepth = slotRadius * 2;//插槽和插头的深度和长度相同，均为半径的*2
+    private final int blockMinSize = 128;//图块最小处尺寸，
+    private final int dBorderToSlot = (blockMinSize - slotDepth) / 2;//图块边界到插槽的距离
 
-    public BlockCropper(Context context,Bitmap originalBitmap) {
+    public BlockCropper(Context context, PuzzleItem puzzleItem) {
         this.context = context;
-        this.originalBitmap = originalBitmap;
-    }
-
-    public BlockCropper(Context context,int resId){
-        this.context = context;
-        this.originalBitmap  = BitmapFactory.decodeResource(context.getResources(), resId);
-    }
-
-    public BlockCropper(Context context, PuzzleContent puzzleContent) {
-        this.context = context;
-        AssetManager assetManager = context.getAssets();
-        if(puzzleContent.isComesWith()){
-            try {
-                InputStream is = assetManager.open(puzzleContent.getFilePath());
-                this.originalBitmap = BitmapFactory.decodeStream(is);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        PuzzleImageHelper puzzleImageHelper = new PuzzleImageHelper(context);
+        Bitmap bitmap = puzzleImageHelper.getBitmap(puzzleItem);
+        if (bitmap != null) {
+            originalBitmap = bitmap;
+        } else {
+            ((Activity) context).finish();
         }
     }
 
@@ -110,7 +93,7 @@ public class BlockCropper {
                     //最后一行
                 } else if (i == rowCount - 1) {
                     if (j == 0) {
-                        pieceList.add(createLeftBottomPiece(x,y));
+                        pieceList.add(createLeftBottomPiece(x, y));
                         x += blockMinSize;
                     } else if (j == columnCount - 1) {
                         //行末尾
@@ -145,7 +128,7 @@ public class BlockCropper {
                             }
                         }
                         //奇数行
-                    }else {
+                    } else {
                         if (j == 0) {
                             pieceList.add(createLeftMiddlePiece2(x, y - slotDepth));
                             x += blockMinSize - slotDepth;
@@ -167,10 +150,10 @@ public class BlockCropper {
             }
 
             List<Point> autoPoints = new ArrayList<>();
-            for (PuzzlePiece p: pieceList) {
-                autoPoints.add(new Point(p.getX(),p.getY()));
+            for (PuzzlePiece p : pieceList) {
+                autoPoints.add(new Point(p.getX(), p.getY()));
             }
-            for (PuzzlePiece p: pieceList) {
+            for (PuzzlePiece p : pieceList) {
                 p.setAutoPoints(autoPoints);
             }
         }
@@ -220,7 +203,7 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(0,0,clippedBitmap);
+        return new PuzzlePiece(0, 0, clippedBitmap);
     }
 
     public PuzzlePiece createTopMiddlePiece1(int x, int y) {
@@ -270,7 +253,7 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(x,y,clippedBitmap);
+        return new PuzzlePiece(x, y, clippedBitmap);
     }
 
     public PuzzlePiece createTopMiddlePiece2(int x, int y) {
@@ -320,7 +303,7 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(x,y,clippedBitmap);
+        return new PuzzlePiece(x, y, clippedBitmap);
     }
 
     public PuzzlePiece createTopRightPiece(int x, int y) {
@@ -364,7 +347,7 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(x,y,clippedBitmap);
+        return new PuzzlePiece(x, y, clippedBitmap);
     }
 
     public PuzzlePiece createLeftMiddlePiece1(int x, int y) {
@@ -415,7 +398,7 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(x,y,clippedBitmap);
+        return new PuzzlePiece(x, y, clippedBitmap);
     }
 
     public PuzzlePiece createLeftMiddlePiece2(int x, int y) {
@@ -468,7 +451,7 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(x,y,clippedBitmap);
+        return new PuzzlePiece(x, y, clippedBitmap);
     }
 
     public PuzzlePiece createLeftBottomPiece(int x, int y) {
@@ -511,19 +494,19 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(x,y,clippedBitmap);
+        return new PuzzlePiece(x, y, clippedBitmap);
     }
 
-    private Paint getPaint(){
+    private Paint getPaint() {
         Paint paint = new Paint();
         paint.setAntiAlias(true);
 //        paint.setShadowLayer(2,2,2, Color.BLACK);
         return paint;
     }
 
-    private Canvas getCanvas(Bitmap clippedBitmap){
+    private Canvas getCanvas(Bitmap clippedBitmap) {
         Canvas canvas = new Canvas(clippedBitmap);
-        canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG));
+        canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
         return canvas;
     }
 
@@ -576,7 +559,7 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(x,y,clippedBitmap);
+        return new PuzzlePiece(x, y, clippedBitmap);
     }
 
     public PuzzlePiece createBottomMiddlePiece2(int x, int y) {
@@ -627,7 +610,7 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(x,y,clippedBitmap);
+        return new PuzzlePiece(x, y, clippedBitmap);
     }
 
     public PuzzlePiece createMiddlePiece1(int x, int y) {
@@ -687,7 +670,7 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(x,y,clippedBitmap);
+        return new PuzzlePiece(x, y, clippedBitmap);
     }
 
     public PuzzlePiece createMiddlePiece2(int x, int y) {
@@ -745,7 +728,7 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(x,y,clippedBitmap);
+        return new PuzzlePiece(x, y, clippedBitmap);
     }
 
     public PuzzlePiece createRightBottomPiece(int x, int y) {
@@ -790,7 +773,7 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(x,y,clippedBitmap);
+        return new PuzzlePiece(x, y, clippedBitmap);
     }
 
     public PuzzlePiece createRightMiddlePiece1(int x, int y) {
@@ -843,7 +826,7 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(x,y,clippedBitmap);
+        return new PuzzlePiece(x, y, clippedBitmap);
     }
 
     public PuzzlePiece createRightMiddlePiece2(int x, int y) {
@@ -893,12 +876,7 @@ public class BlockCropper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
 
-        return new PuzzlePiece(x,y,clippedBitmap);
+        return new PuzzlePiece(x, y, clippedBitmap);
     }
 
-    private List<PuzzlePiece> upset(List<PuzzlePiece> pieceList){
-        List<PuzzlePiece> upsetedList = new ArrayList<>(pieceList.size());
-
-        return upsetedList;
-    }
 }

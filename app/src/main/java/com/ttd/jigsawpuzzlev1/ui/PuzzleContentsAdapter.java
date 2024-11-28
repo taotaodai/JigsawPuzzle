@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -28,11 +29,11 @@ public class PuzzleContentsAdapter extends BaseQuickAdapter<PuzzleContent, Quick
     @Override
     protected void onBindViewHolder(@NonNull QuickViewHolder quickViewHolder, int i, @Nullable PuzzleContent puzzleContent) {
         if (puzzleContent != null) {
-            if(assetManager == null){
+            if (assetManager == null) {
                 assetManager = getContext().getAssets();
             }
-            String filePath = puzzleContent.getFilePath();
-            if (filePath != null) {
+            String filePath = puzzleContent.getCoverPath();
+            if (!TextUtils.isEmpty(filePath)) {
                 try {
                     InputStream is = assetManager.open(filePath);
                     Bitmap bitmap = BitmapFactory.decodeStream(is);
@@ -40,7 +41,11 @@ public class PuzzleContentsAdapter extends BaseQuickAdapter<PuzzleContent, Quick
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+            } else {
+                quickViewHolder.setImageResource(R.id.iv_content, R.mipmap.bg_empty);
             }
+
+            quickViewHolder.setText(R.id.tv_content_name,puzzleContent.getName());
         }
     }
 
