@@ -104,7 +104,8 @@ public class BlockView extends ImageView {
 
                 break;
             case MotionEvent.ACTION_UP:
-                autoHoming(getLeft(), getTop(), getRight(), getBottom());
+                Point point = autoHoming(getLeft(), getTop(), getRight(), getBottom());
+                puzzlePiece.setCurrentPoint(point);
                 break;
         }
         return true;
@@ -122,7 +123,8 @@ public class BlockView extends ImageView {
         }
     }
 
-    private void autoHoming(int left, int top, int right, int bottom) {
+    private Point autoHoming(int left, int top, int right, int bottom) {
+        Point finalPoint = new Point(left, top);
         ViewGroup viewGroup = (ViewGroup) getParent();
         View vBoard = viewGroup.findViewById(R.id.tv_board);
         boolean isInside = left >= vBoard.getLeft() && top >= vBoard.getTop() && right <= vBoard.getRight() && bottom <= vBoard.getBottom();
@@ -130,7 +132,7 @@ public class BlockView extends ImageView {
         Point point = null;
         //每次抬起拼图碎片时计算与目标位置(目标位置指的是：碎片的正确拼接位置，除了自己的以外，其他的可算作干扰项)的最小距离
         for (Point p : puzzlePiece.getAutoPoints()) {
-            double distance = calculateDistance(left, top, p.getX() + vBoard.getLeft(), p.getY() + vBoard.getTop());
+            double distance = calculateDistance(left, top, p.x + vBoard.getLeft(), p.y + vBoard.getTop());
             if (distance < nearestDistance || nearestDistance == 0) {
                 point = p;
             }
@@ -138,18 +140,20 @@ public class BlockView extends ImageView {
 
         }
         Log.i(getClass().getSimpleName(), "在区域内：" + isInside);
-        if(isInside){
+        if (isInside) {
             Log.i(getClass().getSimpleName(), "最小距离：" + nearestDistance);
             //抬起点与目标位置小于一定距离时，可进行自动拼接。这个主要是为了方便操作，手动去凑位置非常费力。
             if (nearestDistance <= 20 && point != null) {
-                int newLeft = point.getX() + vBoard.getLeft();
-                int newTop = point.getY() + vBoard.getTop();
+                int newLeft = point.x + vBoard.getLeft();
+                int newTop = point.y + vBoard.getTop();
                 int relativeX = newLeft - left;
                 int relativeY = newTop - top;
                 layout(newLeft, newTop, right + relativeX, bottom + relativeY);
-                Log.i(getClass().getSimpleName(), "自动匹配最近点位：(" + point.getY()+","+point.getY()+")");
+                Log.i(getClass().getSimpleName(), "自动匹配最近点位：(" + point.x + "," + point.y + ")");
+                finalPoint = new Point(newLeft, newTop);
             }
         }
+        return finalPoint;
     }
 
 

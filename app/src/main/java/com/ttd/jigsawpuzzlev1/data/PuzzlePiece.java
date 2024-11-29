@@ -7,24 +7,27 @@ import java.io.Serializable;
 import java.util.List;
 
 public class PuzzlePiece implements Serializable {
-    private final int  x;//相对于拼图板背景的X坐标
-    private final int y;
+    public final Point realPoint;//真实坐标(相对于拼图板背景)
+    private Point currentPoint;//当前坐标
     private Bitmap bitmap;
     private int rotation;
     private List<Point> autoPoints;
 
-    public PuzzlePiece(int x, int y, Bitmap bitmap) {
-        this.x = x;
-        this.y = y;
+    public PuzzlePiece(Point point, Bitmap bitmap) {
+        this.realPoint = point;
         this.bitmap = bitmap;
     }
 
-    public int getX() {
-        return x;
+    public Point getRealPoint() {
+        return realPoint;
     }
 
-    public int getY() {
-        return y;
+    public Point getCurrentPoint() {
+        return currentPoint;
+    }
+
+    public void setCurrentPoint(Point currentPoint) {
+        this.currentPoint = currentPoint;
     }
 
     public Bitmap getBitmap() {

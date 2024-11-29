@@ -16,15 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ttd.jigsawpuzzlev1.MyApplication;
 import com.ttd.jigsawpuzzlev1.R;
-import com.ttd.jigsawpuzzlev1.data.DaoSession;
-import com.ttd.jigsawpuzzlev1.data.PuzzleContent;
-import com.ttd.jigsawpuzzlev1.data.PuzzleContentDao;
-import com.ttd.jigsawpuzzlev1.data.PuzzleItem;
-import com.ttd.jigsawpuzzlev1.data.PuzzleItemDao;
+import com.ttd.jigsawpuzzlev1.data.db.DaoSession;
+import com.ttd.jigsawpuzzlev1.data.db.PuzzleContent;
+import com.ttd.jigsawpuzzlev1.data.db.PuzzleContentDao;
+import com.ttd.jigsawpuzzlev1.data.db.PuzzleItem;
+import com.ttd.jigsawpuzzlev1.data.db.PuzzleItemDao;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -119,8 +118,25 @@ public class ContentListFragment extends Fragment implements TabFragmentAdapter.
         puzzleContentList.addAll(puzzleContentListNew);
 
         PuzzleContentsAdapter adapter = new PuzzleContentsAdapter(puzzleContentList);
+        adapter.addOnItemChildClickListener(R.id.v_operation, (baseQuickAdapter, view, i) -> showOperationDialog(baseQuickAdapter.getItem(i)));
         setOnItemClickListener(adapter);
 
         rvContents.setAdapter(adapter);
+    }
+
+    private void showOperationDialog(PuzzleContent puzzleContent) {
+        BottomDialogManager bottomDialogManager = new BottomDialogManager(context);
+        bottomDialogManager.create(new String[]{"删除"}, (baseQuickAdapter, view, i) -> {
+            if (i == 0) {
+                DaoSession daoSession = ((MyApplication) context.getApplicationContext()).getDaoSession();
+                PuzzleContentDao puzzleContentDao = daoSession.getPuzzleContentDao();
+                PuzzleItemDao puzzleItemDao = daoSession.getPuzzleItemDao();
+                puzzleContentDao.delete(puzzleContent);
+                puzzleItemDao.deleteInTx(puzzleContent.getPuzzlePicList());
+                bottomDialogManager.dismiss();
+                refresh();
+            }
+        });
+        bottomDialogManager.show();
     }
 }

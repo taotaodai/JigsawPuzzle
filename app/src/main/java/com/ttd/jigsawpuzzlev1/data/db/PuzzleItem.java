@@ -1,4 +1,4 @@
-package com.ttd.jigsawpuzzlev1.data;
+package com.ttd.jigsawpuzzlev1.data.db;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;

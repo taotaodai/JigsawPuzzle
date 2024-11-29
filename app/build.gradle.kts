@@ -45,6 +45,11 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    greendao{
+        schemaVersion = 1
+        daoPackage = "com.ttd.jigsawpuzzlev1.data.db"//DaoSession就生成在这个包
+    }
+
 }
 
 dependencies {
@@ -64,6 +69,7 @@ dependencies {
     implementation ("io.github.cymchad:BaseRecyclerViewAdapterHelper4:4.1.4")
     implementation ("io.github.h07000223:flycoTabLayout:3.0.0")
     implementation ("org.greenrobot:greendao:3.3.0")
+    implementation ("com.google.code.gson:gson:2.10")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

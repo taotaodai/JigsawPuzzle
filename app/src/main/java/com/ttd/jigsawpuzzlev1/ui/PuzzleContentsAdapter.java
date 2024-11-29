@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 import com.chad.library.adapter4.BaseQuickAdapter;
 import com.chad.library.adapter4.viewholder.QuickViewHolder;
 import com.ttd.jigsawpuzzlev1.R;
-import com.ttd.jigsawpuzzlev1.data.PuzzleContent;
+import com.ttd.jigsawpuzzlev1.data.db.PuzzleContent;
 
 import java.io.IOException;
 import java.io.InputStream;

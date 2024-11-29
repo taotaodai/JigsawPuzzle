@@ -8,8 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 
-import com.ttd.jigsawpuzzlev1.R;
-import com.ttd.jigsawpuzzlev1.data.PuzzleItem;
+import com.ttd.jigsawpuzzlev1.data.db.PuzzleItem;
 
 import java.io.IOException;
 import java.io.InputStream;

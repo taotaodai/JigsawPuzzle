@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/purple_200">
+        android:background="@color/deep_purple_300">
         <com.flyco.tablayout.SlidingTabLayout
             android:id="@+id/stl_contents"
             android:layout_width="0dp"
@@ -19,7 +19,7 @@
             app:tl_textSelectColor="@color/white"
             app:tl_indicator_corner_radius="8dp"
             app:tl_indicator_style="BLOCK"
-            app:tl_indicator_color="@color/purple_500"
+            app:tl_indicator_color="@color/deep_purple_500"
             app:tl_indicator_margin_left="4dp"
             app:tl_indicator_margin_right="4dp"/>
         <FrameLayout

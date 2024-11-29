@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_gray2c_r16"
+    android:layout_gravity="bottom">
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_operation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/adapter_bottom_dialog_item"
+        android:layout_margin="16dp"/>
+    <TextView
+        android:id="@+id/v_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_gray70_r24"
+        android:text="取消"
+        android:textColor="@color/gray_db"
+        android:gravity="center"
+        android:layout_margin="16dp"/>
+</LinearLayout>

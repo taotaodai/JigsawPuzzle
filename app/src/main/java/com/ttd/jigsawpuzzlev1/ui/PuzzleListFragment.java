@@ -14,10 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ttd.jigsawpuzzlev1.MyApplication;
 import com.ttd.jigsawpuzzlev1.R;
-import com.ttd.jigsawpuzzlev1.data.DaoSession;
-import com.ttd.jigsawpuzzlev1.data.PuzzleContent;
-import com.ttd.jigsawpuzzlev1.data.PuzzleItem;
-import com.ttd.jigsawpuzzlev1.data.PuzzleItemDao;
+import com.ttd.jigsawpuzzlev1.data.db.DaoSession;
+import com.ttd.jigsawpuzzlev1.data.db.PuzzleContent;
+import com.ttd.jigsawpuzzlev1.data.db.PuzzleItem;
+import com.ttd.jigsawpuzzlev1.data.db.PuzzleItemDao;
 
 import java.util.List;
 
@@ -63,8 +63,23 @@ public class PuzzleListFragment extends Fragment implements TabFragmentAdapter.R
         PuzzleItemDao puzzleItemDao = daoSession.getPuzzleItemDao();
         List<PuzzleItem> puzzleItems = puzzleItemDao.queryBuilder().where(PuzzleItemDao.Properties.ContentId.eq(puzzleContent.getId())).list();
         PuzzleItemAdapter adapter = new PuzzleItemAdapter(puzzleItems);
+        adapter.addOnItemChildClickListener(R.id.v_operation, (baseQuickAdapter, view, i) -> showOperationDialog(baseQuickAdapter.getItem(i)));
         setOnItemClickListener(adapter);
         rvContents.setAdapter(adapter);
+    }
+
+    private void showOperationDialog(PuzzleItem puzzleItem) {
+        BottomDialogManager bottomDialogManager = new BottomDialogManager(context);
+        bottomDialogManager.create(new String[]{"删除"}, (baseQuickAdapter, view, i) -> {
+            if (i == 0) {
+                DaoSession daoSession = ((MyApplication) context.getApplicationContext()).getDaoSession();
+                PuzzleItemDao puzzleItemDao = daoSession.getPuzzleItemDao();
+                puzzleItemDao.delete(puzzleItem);
+                bottomDialogManager.dismiss();
+                refresh();
+            }
+        });
+        bottomDialogManager.show();
     }
 
     public PuzzleContent getPuzzleContent() {

@@ -22,11 +22,11 @@ import androidx.viewpager.widget.ViewPager;
 import com.flyco.tablayout.SlidingTabLayout;
 import com.ttd.jigsawpuzzlev1.MyApplication;
 import com.ttd.jigsawpuzzlev1.R;
-import com.ttd.jigsawpuzzlev1.data.DaoSession;
-import com.ttd.jigsawpuzzlev1.data.PuzzleContent;
-import com.ttd.jigsawpuzzlev1.data.PuzzleContentDao;
-import com.ttd.jigsawpuzzlev1.data.PuzzleItem;
-import com.ttd.jigsawpuzzlev1.data.PuzzleItemDao;
+import com.ttd.jigsawpuzzlev1.data.db.DaoSession;
+import com.ttd.jigsawpuzzlev1.data.db.PuzzleContent;
+import com.ttd.jigsawpuzzlev1.data.db.PuzzleContentDao;
+import com.ttd.jigsawpuzzlev1.data.db.PuzzleItem;
+import com.ttd.jigsawpuzzlev1.data.db.PuzzleItemDao;
 
 import java.util.ArrayList;
 

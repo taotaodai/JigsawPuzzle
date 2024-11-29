@@ -2,8 +2,8 @@ package com.ttd.jigsawpuzzlev1;
 
 import android.app.Application;
 
-import com.ttd.jigsawpuzzlev1.data.DaoMaster;
-import com.ttd.jigsawpuzzlev1.data.DaoSession;
+import com.ttd.jigsawpuzzlev1.data.db.DaoMaster;
+import com.ttd.jigsawpuzzlev1.data.db.DaoSession;
 
 import org.greenrobot.greendao.database.Database;
 
