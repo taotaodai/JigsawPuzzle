@@ -32,12 +32,4 @@
             android:layout_gravity="center"/>
     </FrameLayout>
 
-    <ImageView
-        android:id="@+id/iv_preview"
-        android:layout_width="80dp"
-        android:layout_height="50dp"
-        android:layout_gravity="top|end"
-        tools:src="@mipmap/test_record_preview1"
-        android:scaleType="fitStart"/>
-
 </androidx.cardview.widget.CardView>

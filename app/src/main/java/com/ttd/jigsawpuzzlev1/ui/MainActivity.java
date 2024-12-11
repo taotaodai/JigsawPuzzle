@@ -1,8 +1,6 @@
 package com.ttd.jigsawpuzzlev1.ui;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.os.Build;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +11,6 @@ import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -27,13 +22,17 @@ import com.ttd.jigsawpuzzlev1.data.db.PuzzleContent;
 import com.ttd.jigsawpuzzlev1.data.db.PuzzleContentDao;
 import com.ttd.jigsawpuzzlev1.data.db.PuzzleItem;
 import com.ttd.jigsawpuzzlev1.data.db.PuzzleItemDao;
+import com.ttd.jigsawpuzzlev1.ui.play.PuzzlePlayActivity;
+import com.ttd.jigsawpuzzlev1.ui.record.RecordListFragment;
+import com.ttd.jigsawpuzzlev1.ui.record.RecordListFragmentListener;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements ContentListFragmentListener, View.OnClickListener {
+public class MainActivity extends BaseActivity implements ContentListFragmentListener, RecordListFragmentListener, View.OnClickListener {
     private SlidingTabLayout stlContents;
     private ViewPager vpContents;
-    private ActivityResultLauncher<PickVisualMediaRequest> activityResultLauncher;
+    private ActivityResultLauncher<PickVisualMediaRequest> imagePickerResultLauncher;
+    private ActivityResultLauncher<Intent> recordListResultLauncher;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements ContentListFragme
     }
 
     private void initMediaPicker() {
-        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), o -> {
+        imagePickerResultLauncher = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), o -> {
             if (o != null && isPuzzleListShowing() && puzzleListFragment != null) {
                 DaoSession daoSession = (((MyApplication) getApplication()).getDaoSession());
                 PuzzleItemDao puzzleItemDao = daoSession.getPuzzleItemDao();
@@ -67,22 +66,29 @@ public class MainActivity extends AppCompatActivity implements ContentListFragme
                 }
             }
         });
+
+        recordListResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), o -> {
+//            int code = o.getResultCode();
+            if (recordListFragment != null && recordListFragment.isVisible()) {
+                recordListFragment.refresh();
+            }
+        });
     }
 
     private ArrayList<Fragment> fragments;
     private ContentListFragment topContentListFragment;
     private PuzzleListFragment puzzleListFragment;
+    private RecordListFragment recordListFragment;
 
     private void initFragments() {
         fragments = new ArrayList<>();
         topContentListFragment = new ContentListFragment();
         fragments.add(topContentListFragment);
-        fragments.add(new HistoryListFragment());
+        recordListFragment = new RecordListFragment();
+        fragments.add(recordListFragment);
         TabFragmentAdapter adapter = new TabFragmentAdapter(getSupportFragmentManager(), fragments, new String[]{"目录", "存档"});
         vpContents.setAdapter(adapter);
         stlContents.setViewPager(vpContents);
-
-//        vpContents.getAdapter().no
     }
 
     private void refreshFragments() {
@@ -107,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements ContentListFragme
 
     @Override
     public void onContentClick(PuzzleContent puzzleContent) {
-        if (checkAndRequestPermissions()) {
+        if (permissionsUtil.checkReadImagePermissions()) {
             puzzleListFragment = new PuzzleListFragment();
             Bundle bundle = new Bundle();
             bundle.putSerializable(PuzzleContent.class.getSimpleName(), puzzleContent);
@@ -118,13 +124,31 @@ public class MainActivity extends AppCompatActivity implements ContentListFragme
     }
 
     @Override
-    public void requestPermission() {
-        checkAndRequestPermissions();
+    public void requestPermissionInPageContent() {
+        permissionsUtil.checkReadImagePermissions();
+    }
+
+    @Override
+    public void requestPermissionInPageRecord() {
+        permissionsUtil.setResultCallBack(agree -> {
+            if (agree) {
+                recordListFragment.showHistory();
+            }
+        });
+        boolean agree = permissionsUtil.checkReadImagePermissions();
+        if (agree) {
+            recordListFragment.showHistory();
+        }
+    }
+
+    @Override
+    public void onRecordItemClick(PuzzleItem item) {
+        recordListResultLauncher.launch(PuzzlePlayActivity.getStartIntent(this, item));
     }
 
     private void openImagePicker() {
         PickVisualMediaRequest pickVisualMediaRequest = new PickVisualMediaRequest();
-        activityResultLauncher.launch(pickVisualMediaRequest);
+        imagePickerResultLauncher.launch(pickVisualMediaRequest);
     }
 
     private void showDirCreator() {
@@ -153,43 +177,6 @@ public class MainActivity extends AppCompatActivity implements ContentListFragme
         return isFirst && !isTop;
     }
 
-    private static final int PERMISSION_REQUEST_CODE = 1;
-
-    // 检查权限并请求
-    private boolean checkAndRequestPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_MEDIA_IMAGES},
-                        PERMISSION_REQUEST_CODE);
-                return false;
-            }
-        } else {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        PERMISSION_REQUEST_CODE);
-                return false;
-            }
-        }
-        return true;
-    }
-
-//    // 处理权限请求结果
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        if (requestCode == PERMISSION_REQUEST_CODE) {
-//            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                // 权限被用户同意，可以读取联系人
-//            } else {
-//                // 权限被用户拒绝，需要提示用户或者采取其他方式
-//                Toast.makeText(this, "需要读取联系人的权限", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
-
     @Override
     public void onBackPressed() {
         if (isPuzzleListShowing()) {
@@ -213,4 +200,5 @@ public class MainActivity extends AppCompatActivity implements ContentListFragme
             }
         }
     }
+
 }

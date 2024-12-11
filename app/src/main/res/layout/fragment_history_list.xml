@@ -3,9 +3,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_history"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="历史记录"
-        android:gravity="center"/>
+        android:layout_height="wrap_content"/>
 </LinearLayout>

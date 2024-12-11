@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_gray2c_r16"
+    android:background="@drawable/bg_purple100_r12"
     android:layout_gravity="bottom">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_operation"
@@ -16,9 +16,11 @@
         android:id="@+id/v_cancel"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="@drawable/bg_gray70_r24"
+        android:background="@drawable/bg_purple200_r12"
         android:text="取消"
-        android:textColor="@color/gray_db"
+        android:textStyle="bold"
+        android:textColor="@color/gray_2c"
+        android:textSize="@dimen/text_normal"
         android:gravity="center"
         android:layout_margin="16dp"/>
 </LinearLayout>

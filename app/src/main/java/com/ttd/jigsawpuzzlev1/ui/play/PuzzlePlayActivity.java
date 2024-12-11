@@ -1,9 +1,11 @@
-package com.ttd.jigsawpuzzlev1.ui;
+package com.ttd.jigsawpuzzlev1.ui.play;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -26,7 +28,11 @@ import com.ttd.jigsawpuzzlev1.data.db.DaoSession;
 import com.ttd.jigsawpuzzlev1.data.db.PuzzleItem;
 import com.ttd.jigsawpuzzlev1.data.db.PuzzleRecord;
 import com.ttd.jigsawpuzzlev1.data.db.PuzzleRecordDao;
+import com.ttd.jigsawpuzzlev1.ui.BaseActivity;
+import com.ttd.jigsawpuzzlev1.ui.BlockCropper;
+import com.ttd.jigsawpuzzlev1.ui.record.RecordImageManager;
 import com.ttd.jigsawpuzzlev1.utils.DisplayUtil;
+import com.ttd.jigsawpuzzlev1.utils.SystemUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -38,7 +44,6 @@ public class PuzzlePlayActivity extends BaseActivity implements View.OnClickList
     private BlockCropper blockCropper;
     private Floor floor;
     private PuzzleBoard pbContainer;
-    private LinearLayout llBlockList;
     private LinearLayout llOperation;
     private View vMagnify;
     private View vLessen;
@@ -46,10 +51,14 @@ public class PuzzlePlayActivity extends BaseActivity implements View.OnClickList
     private PuzzleItem puzzleItem;
     private PuzzleRecord puzzleRecord;
 
-    public static void start(Context context, PuzzleItem puzzleItem) {
+    public static Intent getStartIntent(Context context, PuzzleItem puzzleItem) {
         Intent intent = new Intent(context, PuzzlePlayActivity.class);
         intent.putExtra(PuzzleItem.class.getSimpleName(), puzzleItem);
-        context.startActivity(intent);
+        return intent;
+    }
+
+    public static void start(Context context, PuzzleItem puzzleItem) {
+        context.startActivity(getStartIntent(context, puzzleItem));
     }
 
     @Override
@@ -59,7 +68,6 @@ public class PuzzlePlayActivity extends BaseActivity implements View.OnClickList
 
         floor = findViewById(R.id.v_floor);
         pbContainer = findViewById(R.id.pb_block_container);
-        llBlockList = findViewById(R.id.ll_block_list);
         llOperation = findViewById(R.id.ll_operation);
         vBoard = findViewById(R.id.tv_board);
         vMagnify = findViewById(R.id.v_magnify);
@@ -179,12 +187,22 @@ public class PuzzlePlayActivity extends BaseActivity implements View.OnClickList
         }
         String json = new Gson().toJson(puzzleRecordItems);
         PuzzleRecord puzzleRecordTo = new PuzzleRecord(puzzleItem.getId(), json);
+        String previewImage = puzzleRecord.getPreviewPic();
+        if (!TextUtils.isEmpty(previewImage)) {
+            puzzleRecordTo.setPreviewPic(previewImage);
+        }
         DaoSession daoSession = ((MyApplication) getApplication()).getDaoSession();
         PuzzleRecordDao puzzleRecordDao = daoSession.getPuzzleRecordDao();
         if (puzzleRecord != null) {
             puzzleRecordTo.setId(puzzleRecord.getId());
         }
-        puzzleRecordDao.insertOrReplace(puzzleRecordTo);
+        long id = puzzleRecordDao.insertOrReplace(puzzleRecordTo);
+        if (SystemUtil.isApkInDebug(this)) {
+            Log.i(getClass().getSimpleName(), "截图保存结果id=：" + id);
+        }
+        RecordImageManager imageManager = new RecordImageManager(this);
+        imageManager.saveBitmapFromView(pbContainer, puzzleRecordTo);
+
     }
 
     private Point getRandomPoint() {
@@ -236,8 +254,8 @@ public class PuzzlePlayActivity extends BaseActivity implements View.OnClickList
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onPause() {
         save();
+        super.onPause();
     }
 }

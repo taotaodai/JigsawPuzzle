@@ -126,7 +126,7 @@ public class ContentListFragment extends Fragment implements TabFragmentAdapter.
 
     private void showOperationDialog(PuzzleContent puzzleContent) {
         BottomDialogManager bottomDialogManager = new BottomDialogManager(context);
-        bottomDialogManager.create(new String[]{"删除"}, (baseQuickAdapter, view, i) -> {
+        bottomDialogManager.create(new String[]{"删除"}, new int[]{R.mipmap.ic_delete},(baseQuickAdapter, view, i) -> {
             if (i == 0) {
                 DaoSession daoSession = ((MyApplication) context.getApplicationContext()).getDaoSession();
                 PuzzleContentDao puzzleContentDao = daoSession.getPuzzleContentDao();

@@ -18,6 +18,7 @@ import com.ttd.jigsawpuzzlev1.data.db.DaoSession;
 import com.ttd.jigsawpuzzlev1.data.db.PuzzleContent;
 import com.ttd.jigsawpuzzlev1.data.db.PuzzleItem;
 import com.ttd.jigsawpuzzlev1.data.db.PuzzleItemDao;
+import com.ttd.jigsawpuzzlev1.ui.play.PuzzlePlayActivity;
 
 import java.util.List;
 
@@ -26,6 +27,8 @@ public class PuzzleListFragment extends Fragment implements TabFragmentAdapter.R
     private Context context;
     private ContentListFragmentListener contentListFragmentListener;
     private PuzzleContent puzzleContent;
+    private PuzzleItemAdapter adapter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -54,23 +57,27 @@ public class PuzzleListFragment extends Fragment implements TabFragmentAdapter.R
     private void setOnItemClickListener(PuzzleItemAdapter adapter) {
         adapter.setOnItemClickListener((baseQuickAdapter, view, i) -> {
             PuzzleItem item = baseQuickAdapter.getItems().get(i);
-            PuzzlePlayActivity.start(getContext(), item);
+            PuzzlePlayActivity.start(context, item);
         });
     }
 
-    public void refresh(){
-        DaoSession daoSession = ((MyApplication)context.getApplicationContext()).getDaoSession();
+    public void refresh() {
+        DaoSession daoSession = ((MyApplication) context.getApplicationContext()).getDaoSession();
         PuzzleItemDao puzzleItemDao = daoSession.getPuzzleItemDao();
         List<PuzzleItem> puzzleItems = puzzleItemDao.queryBuilder().where(PuzzleItemDao.Properties.ContentId.eq(puzzleContent.getId())).list();
-        PuzzleItemAdapter adapter = new PuzzleItemAdapter(puzzleItems);
-        adapter.addOnItemChildClickListener(R.id.v_operation, (baseQuickAdapter, view, i) -> showOperationDialog(baseQuickAdapter.getItem(i)));
-        setOnItemClickListener(adapter);
-        rvContents.setAdapter(adapter);
+        if (adapter == null) {
+            adapter = new PuzzleItemAdapter(puzzleItems);
+            adapter.addOnItemChildClickListener(R.id.v_operation, (baseQuickAdapter, view, i) -> showOperationDialog(baseQuickAdapter.getItem(i)));
+            setOnItemClickListener(adapter);
+            rvContents.setAdapter(adapter);
+        } else {
+            adapter.submitList(puzzleItems);
+        }
     }
 
     private void showOperationDialog(PuzzleItem puzzleItem) {
         BottomDialogManager bottomDialogManager = new BottomDialogManager(context);
-        bottomDialogManager.create(new String[]{"删除"}, (baseQuickAdapter, view, i) -> {
+        bottomDialogManager.create(new String[]{"删除"}, new int[]{R.mipmap.ic_delete}, (baseQuickAdapter, view, i) -> {
             if (i == 0) {
                 DaoSession daoSession = ((MyApplication) context.getApplicationContext()).getDaoSession();
                 PuzzleItemDao puzzleItemDao = daoSession.getPuzzleItemDao();

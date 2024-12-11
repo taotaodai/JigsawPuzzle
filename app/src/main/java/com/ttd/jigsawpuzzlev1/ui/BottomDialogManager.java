@@ -31,13 +31,13 @@ public class BottomDialogManager {
         this.context = context;
     }
 
-    public void create(String[] items, BaseQuickAdapter.OnItemClickListener<String> listener) {
+    public void create(String[] items, int[] icons,BaseQuickAdapter.OnItemClickListener<String> listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.Theme_Dialog_NoTitle);
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_bottom, null);
         view.findViewById(R.id.v_cancel).setOnClickListener(v -> dialog.dismiss());
         RecyclerView rvOperation = view.findViewById(R.id.rv_operation);
         rvOperation.setLayoutManager(new LinearLayoutManager(context));
-        BottomDialogAdapter adapter = new BottomDialogAdapter(Arrays.asList(items));
+        BottomDialogAdapter adapter = new BottomDialogAdapter(Arrays.asList(items),icons);
         adapter.setOnItemClickListener(listener);
         rvOperation.setAdapter(adapter);
         builder.setView(view);
@@ -60,13 +60,18 @@ public class BottomDialogManager {
     }
 
     public static class BottomDialogAdapter extends BaseQuickAdapter<String, QuickViewHolder> {
-        public BottomDialogAdapter(@NonNull List<? extends String> items) {
+        private final int[] icons;
+        public BottomDialogAdapter(@NonNull List<? extends String> items,int[] icons) {
             super(items);
+            this.icons = icons;
         }
 
         @Override
         protected void onBindViewHolder(@NonNull QuickViewHolder quickViewHolder, int i, @Nullable String s) {
             quickViewHolder.setText(R.id.tv_operation, s);
+            if(icons != null && i < icons.length){
+                quickViewHolder.setImageResource(R.id.iv_icon,icons[i]);
+            }
         }
 
         @NonNull

@@ -10,6 +10,7 @@ import android.net.Uri;
 
 import com.ttd.jigsawpuzzlev1.data.db.PuzzleItem;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -33,15 +34,19 @@ public class PuzzleImageHelper {
                     InputStream is = assetManager.open(filePath);
                     bitmap = BitmapFactory.decodeStream(is);
                 } else {
-                    Uri uri = Uri.parse(puzzleItem.getFilePath());
-                    contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    InputStream is = contentResolver.openInputStream(uri);
-                    bitmap = BitmapFactory.decodeStream(is);
+                    bitmap = convertUri2Bitmap(puzzleItem.getFilePath());
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
         return bitmap;
+    }
+
+    private Bitmap convertUri2Bitmap(String uriString) throws FileNotFoundException {
+        Uri uri = Uri.parse(uriString);
+        contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        InputStream is = contentResolver.openInputStream(uri);
+        return BitmapFactory.decodeStream(is);
     }
 }
